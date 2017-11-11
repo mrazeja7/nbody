@@ -1,0 +1,38 @@
+\begin{thebibliography}{1}
+
+\bibitem{scholarpedia}
+M.~Trenti and P.~Hut, ``N-body simulations (gravitational),'' {\em
+  Scholarpedia}, 2008.
+\newblock [Online; accessed 23-October-2017], available at
+  \url{http://www.scholarpedia.org/article/N-body_simulations}.
+
+\bibitem{nbodypic}
+\relax{Universe Sandbox}, ``{Working} {Through} the {N-Body} {Problem} in
+  {Universe Sandbox$^2$},'' 2017.
+\newblock [Online; accessed 24-October-2017], available at
+  \url{http://universesandbox.com/blog/2016/02/n-body-problem/}.
+
+\bibitem{barnespic}
+Elucidation, ``{Barnes-Hut} {N-body} {Simulation} in {HTML/Javascript},'' 2011.
+\newblock [Online; accessed 24-October-2017], available at
+  \url{https://github.com/Elucidation/Barnes-Hut-Tree-N-body-Implementation-in-HTML-Js}.
+
+\bibitem{camb_book}
+S.~J. Aarseth, ``{Gravitational} {N-Body} {Simulations},'' 2003.
+
+\bibitem{history}
+R.~Yokota and L.~A. Barba, ``{Fast} {N-body} {Simulations} on {GPUs}.''
+  Mechanical Engineering Dept., Boston University, Boston MA, 2011.
+
+\bibitem{teraflops}
+T.~Hamada and K.~Nitadori, ``190 {TFlops} {Astrophysical} {N-body} {Simulation}
+  on a {Cluster} of {GPUs}.'' SC '10: Proceedings of the 2010 ACM/IEEE
+  International Conference for High Performance Computing, Networking, Storage
+  and Analysis, 2010.
+
+\bibitem{wikitesla}
+Wikipedia, ``{GeForce} 200 series,'' 2017.
+\newblock [Online; accessed 25-October-2017], available at
+  \url{https://en.wikipedia.org/wiki/GeForce_200_series}.
+
+\end{thebibliography}
