@@ -122,7 +122,10 @@ public:
 	void advance(uint64_t time) // advances the time by a given number of frames
 	{
 		for (uint64_t i = 0; i < time; ++i)
-			updatePositions();
+		{
+			//updatePositions();
+			optimizedUpdate();
+		}
 	}	
 
 	// gif handling section begins here
@@ -158,6 +161,37 @@ public:
 		delete[] image;
 	}
 	// end of gif handling section
+
+	/* 	
+		a more efficient way to calculate the forces.
+		This design is also very easily parallelized.
+	*/
+	void optimizedUpdate()
+	{
+		for (unsigned int i = 0; i < n; i++) 
+		{  
+			double Fx = 0.0f;
+			double Fy = 0.0f;
+
+			for (unsigned int j = 0; j < n; j++) 
+			{
+				if (j!=i)
+				{
+					const double dx = bodies[j]->xPos - bodies[i]->xPos;
+					const double dy = bodies[j]->yPos - bodies[i]->yPos;
+					const double r2 = dx*dx+dy*dy+0.001f;
+					const double invertedR2 = 1.0f/r2;
+					Fx += dx * invertedR2 * bodies[j]->mass;
+					Fy += dy * invertedR2 * bodies[j]->mass;
+				}
+			}
+			bodies[i]->xVel += G * Fx * bodies[i]->mass;
+			bodies[i]->yVel += G * Fy * bodies[i]->mass;
+			bodies[i]->xPos += bodies[i]->xVel;
+			bodies[i]->yPos += bodies[i]->yVel;
+		}
+		currentTime++;
+	}
 	
 };
 
@@ -166,13 +200,13 @@ int main(int argc,char **argv)
 	Simulation sim;
 	sim.setGifProps(1024,1024,0);
 	sim.randomBodies(1000);
-	
+
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
-		sim.advance(1);
-		//sim.assembleFrame();
+		sim.advance(10);
+		sim.assembleFrame();
 		//if (i % 10 == 0) 
 		//	cout << i << endl;
 	}
