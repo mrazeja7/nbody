@@ -166,15 +166,18 @@ int main(int argc,char **argv)
 	Simulation sim;
 	sim.setGifProps(1024,1024,0);
 	sim.randomBodies(1000);
-	//sim.advance(100);
+	
+	high_resolution_clock::time_point start = high_resolution_clock::now();
 
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
-		sim.advance(10);
-		sim.assembleFrame();
-		if (i % 10 == 0) 
-			cout << i << endl;
+		sim.advance(1);
+		//sim.assembleFrame();
+		//if (i % 10 == 0) 
+		//	cout << i << endl;
 	}
+	double finish = duration_cast<duration<double>>(high_resolution_clock::now()-start).count();
+	cout << sim.getCount() << " bodies, " << sim.getCurrentTime() << " iterations, " << finish << " seconds." << endl;
 
 	return 0;
 }
