@@ -60,9 +60,18 @@ private:
 	// gif
 	int32_t gifW,gifH,gifDelay; // gif dimensions
 	GifWriter gWriter;
+	int nthreads = 1;
 public:
 	uint8_t *image; // pointer to an array that represents each frame of the gif
 
+	void setThreads(int n)
+	{
+		nthreads = n;
+	}
+	int getThreads()
+	{
+		return nthreads;
+	}
 	uint64_t getCount()
 	{
 		return n;
@@ -164,15 +173,20 @@ public:
 
 	/* 	
 		a more efficient way to calculate the forces.
-		This design is also very easily parallelized.
+		This design is probably also very easily parallelized.
+
+		I only used a simple parallel for combined with a simd reduction
+		which yielded quite a nice (not yet properly measured) speedup.
 	*/
 	void optimizedUpdate()
 	{
+		#pragma omp parallel for schedule(dynamic) num_threads(nthreads)
 		for (unsigned int i = 0; i < n; i++) 
 		{  
 			double Fx = 0.0f;
 			double Fy = 0.0f;
 
+			#pragma omp simd reduction(+:Fx,Fy)
 			for (unsigned int j = 0; j < n; j++) 
 			{
 				if (j!=i)
@@ -195,23 +209,30 @@ public:
 	
 };
 
-int main(int argc,char **argv)
+void simulate(int bodies ,int iters, int threads)
 {
 	Simulation sim;
-	sim.setGifProps(1024,1024,0);
-	sim.randomBodies(1000);
-
+	sim.setGifProps(1024,1024,1);
+	sim.randomBodies(bodies);
+	sim.setThreads(threads);
 	high_resolution_clock::time_point start = high_resolution_clock::now();
-
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < iters; ++i)
 	{
-		sim.advance(10);
-		sim.assembleFrame();
-		//if (i % 10 == 0) 
-		//	cout << i << endl;
+		sim.advance(1);
+		//sim.assembleFrame();
 	}
-	double finish = duration_cast<duration<double>>(high_resolution_clock::now()-start).count();
-	cout << sim.getCount() << " bodies, " << sim.getCurrentTime() << " iterations, " << finish << " seconds." << endl;
+
+	float finish = duration_cast<duration<float>>(high_resolution_clock::now()-start).count();
+
+	//cout << sim.getCount() << " bodies, " << sim.getCurrentTime() << " iterations, " << finish << " seconds." << endl;
+
+	cout << sim.getCount() << /*" bodies\t"*/"\t" << sim.getCurrentTime() << /*" iterations\t"*/"\t" 
+		 << sim.getThreads() << /*"threads\t"*/"\t" << finish << /*" seconds\t"*/"\t" << endl;	
+}
+
+int main(int argc,char **argv)
+{
+	simulate(1000,1000,1);
 
 	return 0;
 }
