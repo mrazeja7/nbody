@@ -232,7 +232,7 @@ void simulate(int bodies ,int iters, int threads)
 
 int main(int argc,char **argv)
 {
-	simulate(1000,1000,1);
+	simulate(1000,1000,2);
 
 	return 0;
 }
