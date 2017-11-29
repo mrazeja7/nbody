@@ -209,7 +209,7 @@ public:
 	
 };
 
-void simulate(int bodies ,int iters, int threads)
+void simulate(int bodies, int iters, int threads)
 {
 	Simulation sim;
 	sim.setGifProps(1024,1024,1);
