@@ -218,7 +218,7 @@ void simulate(int bodies, int iters, int threads)
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 	for (int i = 0; i < iters; ++i)
 	{
-		sim.advance(1);
+		sim.optimizedUpdate();
 		//sim.assembleFrame();
 	}
 
@@ -232,7 +232,7 @@ void simulate(int bodies, int iters, int threads)
 
 int main(int argc,char **argv)
 {
-	simulate(1000,1000,2);
+	simulate(1000,1000,4);
 
 	return 0;
 }

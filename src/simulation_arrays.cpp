@@ -1,4 +1,12 @@
 /* simulation_arrays.cpp */
+/* 
+	a modified version of the OOP code. This time, I slightly redesigned the code
+   	from a "array of structures" style to a more cache-friendly "structure of arrays" design.
+   	In doing so, I got rid of both the Body and the Simulation classes completely, and just 
+   	copied and pasted the source code. I left some of the getters for ease of use.
+   	I also got rid of the gif library and its handlers. I will use the OOP version of
+   	the implementation to create animations.
+*/
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -23,6 +31,7 @@ uint64_t n;
 uint64_t currentTime;
 int32_t gifW,gifH,gifDelay;
 float timeInSeconds;
+float gflops;
 uint64_t getCurrentTime()
 {
 	return currentTime;
@@ -31,30 +40,30 @@ uint64_t getCount()
 {
 	return n;
 }
-void optimizedUpdate() 
+void optimizedUpdate() // estimated FLOP counts in comments on each line
 {
 	#pragma omp parallel for schedule(dynamic) num_threads(nthreads)
 	for (unsigned int i = 0; i < n; i++) 
 	{  
-		float Fx = 0.0f;
-		float Fy = 0.0f;
+		float Fx = 0.0f; // 1
+		float Fy = 0.0f; // 1
 		#pragma omp simd reduction(+:Fx,Fy)
 		for (unsigned int j = 0; j < n; j++) 
 		{
 			if (j!=i)
 			{
-				const float dx = xPos[j] - xPos[i];
-				const float dy = yPos[j] - yPos[i];
-				const float r2 = dx*dx+dy*dy+0.001f;
-				const float invertedR2 = 1.0f/r2;
-				Fx += dx * invertedR2 * mass[j];
-				Fy += dy * invertedR2 * mass[j];
+				const float dx = xPos[j] - xPos[i]; // 2
+				const float dy = yPos[j] - yPos[i]; // 2
+				const float r2 = dx*dx+dy*dy+0.001f; // 5
+				const float invertedR2 = 1.0f/r2; // 2
+				Fx += dx * invertedR2 * mass[j]; // 4
+				Fy += dy * invertedR2 * mass[j]; // 4
 			}
 		}
-		xVel[i] += G * Fx * mass[i];
-		yVel[i] += G * Fy * mass[i];
-		xPos[i] += xVel[i];
-		yPos[i] += yVel[i];
+		xVel[i] += G * Fx * mass[i]; // 4
+		yVel[i] += G * Fy * mass[i]; // 4
+		xPos[i] += xVel[i]; // 2
+		yPos[i] += yVel[i]; // 2
 	}
 	currentTime++;
 }
@@ -101,8 +110,9 @@ void simulate(int bodies,int iters)
 		optimizedUpdate();
 
 	float finish = duration_cast<duration<float>>(high_resolution_clock::now()-start).count();
+	uint64_t appxFlops = (21*getCount()-11)*getCount()*iters;
 	timeInSeconds = finish;
-	
+	gflops = 1e-9 * appxFlops / finish;	
 }
 
 int main(int argc,char **argv)
@@ -118,7 +128,7 @@ int main(int argc,char **argv)
 	
 	cout << nthreads << /*" threads\t"*/"\t";
 	simulate(b,k);
-	cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds" << */endl;	
-	cout << getCount() << " bodies\t" << getCurrentTime() << " iterations\t" << timeInSeconds << " seconds" << endl;	
+	//cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
+	cout << getCount() << " bodies\n" << getCurrentTime() << " iterations\n" << timeInSeconds << " seconds\n" << gflops << " GFlops/s." << endl;
 	return 0;
 }
