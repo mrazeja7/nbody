@@ -1,11 +1,7 @@
-/* simulation_arrays.cpp */
+/* simulation_phi.cpp */
 /* 
-	a modified version of the OOP code. This time, I slightly redesigned the code
-   	from a "array of structures" style to a more cache-friendly "structure of arrays" design.
-   	In doing so, I got rid of both the Body and the Simulation classes completely, and just 
-   	copied and pasted the source code. I left some of the getters for ease of use.
-   	I also got rid of the gif library and its handlers. I will use the OOP version of
-   	the implementation to create animations.
+	This is an implementation of my project that is meant to be optimized for Intel's Xeon Phi coprocessor.
+	This version of my project will be run on a Xeon Phi 7120X (Knight's Corner product line)
 */
 #include <iostream>
 #include <fstream>
@@ -20,13 +16,15 @@
 using namespace std;
 using namespace std::chrono;
 
+#pragma offload_attribute(pop)
+#pragma omp declare target
+
 float G = 6.674e-11;
-int nthreads;
-float *xPos;
-float *yPos;
-float *xVel;
-float *yVel;
-float *mass;
+float *xPos __attribute__((aligned(256)));
+float *yPos __attribute__((aligned(256)));
+float *xVel __attribute__((aligned(256)));
+float *yVel __attribute__((aligned(256)));
+float *mass __attribute__((aligned(256)));
 uint64_t n;
 uint64_t currentTime;
 int32_t gifW,gifH,gifDelay;
@@ -42,7 +40,7 @@ uint64_t getCount()
 }
 void optimizedUpdate() // estimated FLOP counts in comments on each line
 {
-	#pragma omp parallel for schedule(dynamic) num_threads(nthreads)
+	#pragma omp parallel for schedule(dynamic)
 	for (unsigned int i = 0; i < n; i++) 
 	{  
 		float Fx = 0.0f; // 1
@@ -113,7 +111,7 @@ void simulate(int bodies,int iters)
 	// (19*(n-1) + 14)*n*k total floating point operations == (19n-5)*n*k
 	uint64_t appxFlops = (19*getCount()-5)*getCount()*iters;
 	timeInSeconds = finish;
-	gflops = 1e-9 * appxFlops / finish;	
+	gflops = 1e-9 * appxFlops / finish;
 }
 
 int main(int argc,char **argv)
@@ -124,12 +122,26 @@ int main(int argc,char **argv)
 	cout << "Number of iterations: ";	
 	int k;
 	cin >> k;
-	cout << "Number of threads: ";
-	cin >> nthreads;	
-	
-	cout << nthreads << /*" threads\t"*/"\t";
-	simulate(b,k);
-	//cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
-	cout << getCount() << " bodies\n" << getCurrentTime() << " iterations\n" << timeInSeconds << " seconds\n" << gflops << " GFlops/s." << endl;
+	int threads = -1;
+	cout << "Use Xeon Phi [y/n]? ";
+	char c;
+	cin >> c;
+	if (c=='y')
+	{
+		#pragma offload target(mic: 0)
+		{
+			threads = omp_get_max_threads();
+			cout << threads << /*" threads\t"*/"\t";// << endl;
+			simulate(b,k);	
+			cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
+		}
+	}
+	else
+	{
+		threads = omp_get_max_threads();
+		cout << threads << /*" threads\t"*/"\t";// << endl;
+		simulate(b,k);
+		cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
+	}
 	return 0;
 }
