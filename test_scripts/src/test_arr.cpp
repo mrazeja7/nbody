@@ -1,9 +1,12 @@
-/* simulation_phi.cpp */
+/* simulation_arrays.cpp */
 /* 
-	This is an implementation of my project that is meant to be optimized for Intel's Xeon Phi coprocessor.
-	This version of my project will be run on a Xeon Phi 7120X (Knight's Corner product line)
+	a modified version of the OOP code. This time, I slightly redesigned the code
+   	from a "array of structures" style to a more cache-friendly "structure of arrays" design.
+   	In doing so, I got rid of both the Body and the Simulation classes completely, and just 
+   	copied and pasted the source code. I left some of the getters for ease of use.
+   	I also got rid of the gif library and its handlers. I will use the OOP version of
+   	the implementation to create animations.
 */
-#pragma offload_attribute(push, target(mic))
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -16,19 +19,17 @@
 //#include "gif.h" // gif library for generating animations of the simulation
 using namespace std;
 using namespace std::chrono;
-#pragma offload_attribute(pop)
-
-#pragma omp declare target
 
 float G = 6.674e-11;
-float *xPos __attribute__((aligned(256)));
-float *yPos __attribute__((aligned(256)));
-float *xVel __attribute__((aligned(256)));
-float *yVel __attribute__((aligned(256)));
-float *mass __attribute__((aligned(256)));
+int nthreads;
+float *xPos;
+float *yPos;
+float *xVel;
+float *yVel;
+float *mass;
 uint64_t n;
 uint64_t currentTime;
-int32_t gifW,gifH;
+int32_t gifW,gifH,gifDelay;
 float timeInSeconds;
 float gflops;
 uint64_t getCurrentTime()
@@ -41,7 +42,7 @@ uint64_t getCount()
 }
 void optimizedUpdate() // estimated FLOP counts in comments on each line
 {
-	#pragma omp parallel for schedule(dynamic)
+	#pragma omp parallel for schedule(dynamic) num_threads(nthreads)
 	for (unsigned int i = 0; i < n; i++) 
 	{  
 		float Fx = 0.0f; // 1
@@ -70,6 +71,7 @@ void setGifProps(int w, int h, int d)
 {
 	gifW = w;
 	gifH = h;
+	gifDelay = d;		
 }
 void randomBodies(uint64_t count)
 {
@@ -99,51 +101,35 @@ void randomBodies(uint64_t count)
 	n = count;
 }
 
-void simulate(int bodies,int iters)
+void simulate()
 {
+	//cout << "Number of bodies: ";
+	int b;
+	cin >> b;
+	//cout << "Number of iterations: ";	
+	int k;
+	cin >> k;
+	//cout << "Number of threads: ";
+	cin >> nthreads;		
+	cout << nthreads << /*" threads\t"*/"\t";
 	setGifProps(1024,1024,1);
-	randomBodies(bodies);
+	randomBodies(b);
 	high_resolution_clock::time_point start = high_resolution_clock::now();
-	for (int i = 0; i < iters; ++i)
+	for (int i = 0; i < k; ++i)
 		optimizedUpdate();
 
 	float finish = duration_cast<duration<float>>(high_resolution_clock::now()-start).count();
 	// (19*(n-1) + 14)*n*k total floating point operations == (19n-5)*n*k
-	uint64_t appxFlops = (19*getCount()-5)*getCount()*iters;
+	uint64_t appxFlops = (19*getCount()-5)*getCount()*k;
 	timeInSeconds = finish;
 	gflops = 1e-9 * appxFlops / finish;
-}
 
-#pragma omp end declare target
+	cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
+	//cout << getCount() << " bodies\n" << getCurrentTime() << " iterations\n" << timeInSeconds << " seconds\n" << gflops << " GFlops/s." << endl;
+}
 
 int main(int argc,char **argv)
 {
-	cout << "Number of bodies: ";
-	int b;
-	cin >> b;
-	cout << "Number of iterations: ";	
-	int k;
-	cin >> k;
-	int threads = -1;
-	cout << "Use Xeon Phi [y/n]? ";
-	char c;
-	cin >> c;
-	if (c=='y')
-	{
-		#pragma offload target(mic: 0)
-		{
-			threads = omp_get_max_threads();
-			cout << threads << /*" threads\t"*/"\t";// << endl;
-			simulate(b,k);	
-			cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
-		}
-	}
-	else
-	{
-		threads = omp_get_max_threads();
-		cout << threads << /*" threads\t"*/"\t";// << endl;
-		simulate(b,k);
-		cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
-	}
+	simulate();	
 	return 0;
 }
