@@ -194,10 +194,10 @@ void simulate(int bodies, int iters)
 
 int main(int argc, char **argv)
 {
-	cout << "Number of bodies: ";
+//	cout << "Number of bodies: ";
 	int b;
 	cin >> b;
-	cout << "Number of iterations: ";
+//	cout << "Number of iterations: ";
 	int k;
 	cin >> k;
 
@@ -206,6 +206,6 @@ int main(int argc, char **argv)
 	cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */<< endl;	
 	//cout << getCount() << " bodies\n" << getCurrentTime() << " iterations\n" << timeInSeconds << " seconds\n" << gflops << " GFlops/s." << endl;	
 
-	system("PAUSE");
+//	system("PAUSE");
 	return 0;
 }
