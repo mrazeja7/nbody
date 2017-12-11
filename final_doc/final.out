@@ -4,3 +4,8 @@
 \BOOKMARK [1][-]{section.4}{Related work in literature}{}% 4
 \BOOKMARK [1][-]{section.5}{Methods and facilities used}{}% 5
 \BOOKMARK [1][-]{section.6}{Breakdown of tasks, time and work schedule}{}% 6
+\BOOKMARK [1][-]{section.7}{Project progress: Naive implementation}{}% 7
+\BOOKMARK [1][-]{section.8}{Project progress: Structure of arrays}{}% 8
+\BOOKMARK [1][-]{section.9}{Project progress: Parallelization with OpenMP}{}% 9
+\BOOKMARK [1][-]{section.10}{Project progress: Intel Xeon Phi}{}% 10
+\BOOKMARK [1][-]{section.11}{Issue: ARM-based device}{}% 11

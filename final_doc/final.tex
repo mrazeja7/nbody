@@ -109,7 +109,7 @@
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.45\textwidth]{barneshut.png}
-		\caption{An illustration of the Barnes-Hut quadrant division}
+		\caption{\label{cells}An illustration of the Barnes-Hut quadrant division}
 		\cite{barnespic}
 	\end{figure}
 	
@@ -145,7 +145,11 @@
 		
 	\section{Methods and facilities used}
 	
+	%TODO c++11 a chrono
+	
 		Before I started working on this semestral project, I planned to first implement a naive version of the brute-force N-Body simulation algorithm. Then I wanted to work iteratively in an effort to optimize the source code in order to take better advantage of a computer's memory hierarchy, more specifically the CPU's caches. 
+		
+		I decided to use the C++ programming language to write all of my source code where applicable, and for the CUDA part of my implementation, I would use NVIDIA's CUDA-C language, which is actually just C/C++ with a little bit of extra functionality.
 		
 		Then I wanted to transform the code using the OpenMP parallel programming interface, and finally, if time permitted, create an implementation that would use NVIDIA's CUDA technology.
 		
@@ -174,15 +178,72 @@
 		
 		The last step in my course project would be the analysis of data was to be gathered.
 		
-		To put my proposed work schedule into perspective, you can take a look at the Gantt chart below.
+		To put my proposed work schedule into perspective, you can take a look at the Gantt chart in figure \ref{gantt}.
 		
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=.45\textwidth]{ganttchart.png}
-			\caption{Gantt chart of the proposed estimated project work schedule}
+			\caption{\label{gantt}Gantt chart of the proposed estimated project work schedule}
 		\end{figure} 
 		
+	\newpage
+	\section{Project progress: Naive implementation}
 	
+		The first task on my plan was the implementation of a naive version of the brute-force N-Body simulation algorithm. 
+		
+		I chose to write the naive version in such a way that it would be very easily readable and simple to understand. I created a \texttt{Body} class that represents each individual body object and all of its properties (those being the postion vector, velocity vector and mass). This class also contains an \texttt{updatePhysics()} method, which essentially calculates the $\textbf{f}_{ij}$ force vector for any body $j$ that is passed to the method as an argument. The whole system used in the simulation is contained in the \texttt{Simulation} class. It contains a \texttt{vector} of all bodies in a given system, as well as additional properties used for the simulation, such as the number of iterations that have passed since the beginning, or a method that takes care of randomly generating a given number of bodies.
+		
+		I quickly benchmarked this early version of the implementation and found out that it produces a computing performance of about $5$ $GFLOPs/s$ when run on a single core on K-State's Beocat supercomputer.
+		
+		\subsection*{GIF animations}
+		
+			A utility that I also used a lot of the time when creating and debugging the naive implementation was the GIF-making library for C/C++ created by Charlie Tangora. \cite{gif} Using this library, I could see the results of any edits I made in the source code almost immediately. I integrated the library in such a way that it is very simple to generate an animated image in \texttt{.gif} format with given dimensions and number of frames. The background of this animated image is always black, with all bodies being represented as green dots. The shade of green of these dots is also customized to reflect the mass of each body in the system.
+		
+	\section{Project progress: Structure of arrays}
+		
+		After having completed the naive implementation, I took a look at redesigning pretty much the whole source code in order to take advantage of the CPU's cache.
+		
+		I thought about the concept of spatial locality of data in the cache, and decided to ditch the object-oriented design of my simulation. I ended up changing my whole approach to storing data in memory. Instead of keeping on using an "array of structures" kind of design that is easy to understand at a glance, I rewrote the code to represent a "structure of arrays" approach. In reality, I got rid of nearly the entire class structure of the code, and instead used dynamically allocated arrays to store the attributes of all bodies. I implemented different arrays that each stored one of the parameters for all bodies within the system. This way, the spatial locality concept of the cache can be taken advantage of during the force vector calculations.
+		
+		\subsection*{Resulting speedup}
+			After running some very quick benchmarks and comparing the results, I found out that this improved version of my simulation boasts an approximately 10\% higher performance when compared to the previous object-oriented approach depending on the simulation size (i.e. body count and number of iterations).
+			
+			You can see the differences in the performance of these two designs in figure \ref{oopsoa}.		
+			
+			\begin{figure}[ht]			
+				\centering
+				\includegraphics[width=.45\textwidth]{oop_vs_soa.png}
+				\caption{\label{oopsoa}Performance comparison of OOP vs SOA approaches}
+			\end{figure} 
+	
+	\section{Project progress: Parallelization with OpenMP}
+	
+		After redesigning the application to make better use of the CPU's cache, I took a look at parallelizing the code.
+		
+		As the machines I would use to benchmark the program contain multiple processors each with a significant amount of computing cores, not taking advantage of them would mean a loss of a huge amount of performance.
+		
+		With help from the OpenMP parallel programming interface, I changed the code in a way that the force vector calculations could be performed almost completely independently in different CPU threads. To make this possible, I used the \texttt{\#pragma omp parallel for} directive, which automatically parallelizes a \texttt{for} loop. Using the \texttt{schedule(dynamic)} clause, I told the compiler to schedule each iteration of the \texttt{for} loop dynamically. From running some quick tests, I found that this approach was slightly more efficient (a speedup of about 3\%) than static or any other form of scheduling. I also used the \texttt{\#pragma omp simd reduction} clause to take advantage of some of the vector instructions that all modern x86 CPUs have. Using this directive also further helps the compiler vectorize \texttt{for} loops.
+		
+		\subsection*{Resulting speedup}
+			To benchmark and verify the speedup and effectiveness of my efforts to try to parallelize the application using OpenMP, I ran a multitude of benchmarks, all on Beocat.
+			
+			I mainly ran benchmarks that measured the simulation's speedup depending on the number of threads being used. I also ran all of these tests with variable numbers of bodies in the simulation. You can see a graph of some of my results in figure \ref{parspeedup}. 
+			
+			\begin{figure}[ht]			
+				\centering
+				\includegraphics[width=.45\textwidth]{parspeedup.png}
+				\caption{\label{parspeedup}Parallel speedups when using OpenMP depending on number of threads and bodies}
+			\end{figure} 
+			
+			I decided to only pick a couple of data points - you can see the speedups when using $2-32$ threads when compared to just a sequentially run application with either $10, 20, 100 or 500$ thousand bodies, respectively. It is apparent that for large amounts of bodies, the speedups get even higher, reaching almost linear levels. The best speedup I measured when using 32 threads was $31.69$, which is extremely good and can't really be improved much further.
+			
+			The sometimes amazing speedups I measured are definitely due to the embarassingly parallel nature of the brute-force N-Body simulation algorithm, but also due to the high efficiency of all compiler optimizations, vectorization and the OpenMP interface.
+			
+		\section{Project progress: Intel Xeon Phi}
+			
+		\section{Issue: ARM-based device}
+		
+		
 	
 	%=====================================================	
 \end{document}
