@@ -143,17 +143,46 @@
 		
 		The resulting 190.5 \textit{TFLOP/s} is a very respectable number, especially since the code that was used to run the computation used the Barnes-Hut algorithm, instead of the "faster" (\textit{FLOP/s}- or performance-wise) brute-force method.
 		
-		%TODO prevest nsaledujici paragraf do miluleho casu, dale vysvetlit crash OrangePi
-		
 	\section{Methods and facilities used}
-		I will try to create an efficient implementation of the brute-force algorithm with regards to cache-friendliness, then I will parallelize it using OpenMP and possibly CUDA, if time constraints permit. 
-		I will then measure the computation times on a multitude of different devices:
+	
+		Before I started working on this semestral project, I planned to first implement a naive version of the brute-force N-Body simulation algorithm. Then I wanted to work iteratively in an effort to optimize the source code in order to take better advantage of a computer's memory hierarchy, more specifically the CPU's caches. 
+		
+		Then I wanted to transform the code using the OpenMP parallel programming interface, and finally, if time permitted, create an implementation that would use NVIDIA's CUDA technology.
+		
+		I planned on testing and benchmarking the computing performance of all of these proposed versions on the following hardware:
 		\begin{itemize}  
-			\item[-]{a typical personal computer CPU architecture, i.e. Intel’s x86-64. I will use Kansas State University’s Beocat supercomputer to run the tests on this architecture.}
-			\item[-]{an ARM-architecture based computer. I will use my own OrangePi One micro-computer, which is currently setup as a media center in my home. This micro-computer uses a single Allwinner H3 SoC (system-on-chip) with a quad-core processor and an integrated GPU. The CPU's clock speed is 1200 MHz. I will install a fresh distribution of ARMbian on it and run my tests that way.}
-			\item[-]{a computer equipped with Intel’s Xeon Phi coprocessor card. I hope to confirm my theoretical knowledge I have about this coprocessor card – that it is extremely suitable for simple, embarrassingly parallel computations and vector computing. I hope to see a massive speedup compared to Intel’s x86-64 architecture. I will run my tests on a Xeon Phi-equipped computer at my home university (CTU in Prague, CZ).}
-			\item[-]{if time permits, I would like to run a CUDA implementation on a computer equipped with an nVidia graphics processor. I would like to run these benchmarks on nodes that are part of Beocat and have dedicated GPUs just for this purpose.}
+			\item[-]{a typical personal computer CPU architecture, i.e. Intel’s x86-64. I planned to use Kansas State University’s Beocat supercomputer to run the tests on this architecture.}
+			
+			\item[-]{an ARM-architecture based computer. I wanted to use my own OrangePi One micro-computer, which had been  setup as a media center in my home. This micro-computer uses a single Allwinner H3 SoC (system-on-chip) with a quad-core processor and an integrated GPU. The CPU's clock speed is 1200 MHz. I planned to install a fresh distribution of the ARMbian OS on it and run all of my tests that way.}
+			
+			\item[-]{a computer equipped with Intel’s Xeon Phi coprocessor card. I hoped to confirm my theoretical knowledge I have about this coprocessor card – that it is extremely suitable for simple, embarrassingly parallel computations and vector computing. I hoped to see a significant speedup compared to Intel’s x86-64 architecture. I planned to run my tests on a Xeon Phi-equipped computer at my home university (Czech Ttechnical University in Prague, Czech Republic).}
+			
+			\item[-]{I also wanted to run a CUDA implementation on a computer equipped with an NVIDIA graphics processor. I hoped to run these benchmarks on nodes that are part of Beocat and have dedicated GPUs just for this purpose.}
 		\end{itemize}
+	
+	\section{Breakdown of tasks, time and work schedule}
+	
+		The first step needed to take is the implementation of a really simple, unoptimized, sequential N-body simulation algorithm. 
+		
+		The next task on my plan was the integration of some sort of graphical interface that I would use to better understand the exact happenings during my calculations, and to possibly help debug the algorithm's implementation. Another good side that I thought it would bring to the project is the fact that it would look
+		
+		After obtaining a working naive sequential implementation of the project, I planned to start my work on redesigning the algorithm in a more efficient manner. I wanted to try to apply my knowledge that I gained duriny the semester in CIS 750 in order to maximize the usage of all system resources, which of course includes the usage of a parallel interface, which was also a step that I needed to take. I planned to integrate the OpenMP parallel programming interface into the code, as well as directives used to run programs on the Xeon Phi coprocessor card (with the use of Intel's C++ compiler).
+		
+		Of course, I also planned to create a parallel version of my implementation using NVIDIA’s CUDA technology.
+		
+		I would then test and measure running times with a variable amount of cores used for the computation and a variable amount of bodies. I wanted to ideally try to collect a large amount of data to get a better grasp on the overall performance of the algorithm when used on different machines and chips.
+		
+		The last step in my course project would be the analysis of data was to be gathered.
+		
+		To put my proposed work schedule into perspective, you can take a look at the Gantt chart below.
+		
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=.45\textwidth]{ganttchart.png}
+			\caption{Gantt chart of the proposed estimated project work schedule}
+		\end{figure} 
+		
+	
 	
 	%=====================================================	
 \end{document}
