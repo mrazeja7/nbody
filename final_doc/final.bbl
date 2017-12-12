@@ -1,0 +1,65 @@
+\begin{thebibliography}{10}
+
+\bibitem{scholarpedia}
+M.~Trenti and P.~Hut, ``N-body simulations (gravitational),'' {\em
+  Scholarpedia}, 2008.
+\newblock [Online; accessed 23-October-2017], available at
+  \url{http://www.scholarpedia.org/article/N-body_simulations}.
+
+\bibitem{nbodypic}
+\relax{Universe Sandbox}, ``{Working} {Through} the {N-Body} {Problem} in
+  {Universe Sandbox$^2$},'' 2017.
+\newblock [Online; accessed 24-October-2017], available at
+  \url{http://universesandbox.com/blog/2016/02/n-body-problem/}.
+
+\bibitem{nvidia-article}
+NVIDIA, ``{GPU} {Gems} 3, {Chapter} 31,'' 2007.
+\newblock [Online; accessed 9-December-2017], available at
+  \url{https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch31.html}.
+
+\bibitem{constant}
+P.~J. {Mohr}, D.~B. {Newell}, and B.~N. {Taylor}, ``{CODATA recommended values
+  of the fundamental physical constants: 2014*},'' {\em Reviews of Modern
+  Physics}, vol.~88, p.~035009, July 2016.
+
+\bibitem{barnespic}
+Elucidation, ``{Barnes-Hut} {N-body} {Simulation} in {HTML/Javascript},'' 2011.
+\newblock [Online; accessed 24-October-2017], available at
+  \url{https://github.com/Elucidation/Barnes-Hut-Tree-N-body-Implementation-in-HTML-Js}.
+
+\bibitem{camb_book}
+S.~J. Aarseth, ``{Gravitational} {N-Body} {Simulations},'' 2003.
+
+\bibitem{history}
+R.~Yokota and L.~A. Barba, ``{Fast} {N-body} {Simulations} on {GPUs}.''
+  Mechanical Engineering Dept., Boston University, Boston MA, 2011.
+
+\bibitem{teraflops}
+T.~Hamada and K.~Nitadori, ``190 {TFlops} {Astrophysical} {N-body} {Simulation}
+  on a {Cluster} of {GPUs}.'' SC '10: Proceedings of the 2010 ACM/IEEE
+  International Conference for High Performance Computing, Networking, Storage
+  and Analysis, 2010.
+
+\bibitem{wikitesla}
+Wikipedia, ``{GeForce} 200 series,'' 2017.
+\newblock [Online; accessed 25-October-2017], available at
+  \url{https://en.wikipedia.org/wiki/GeForce_200_series}.
+
+\bibitem{gif}
+C.~Tangora, ``{gif-h},'' 2014.
+\newblock [Online; accessed 7-November-2017], available at
+  \url{https://github.com/ginsweater/gif-h}.
+
+\bibitem{ark}
+Intel, ``{Intel®} {Xeon} {Phi™} {Coprocessor} {7120X} {Product}
+  {Specifications},'' 2017.
+\newblock [Online; accessed 11-December-2017], available at
+  \url{https://ark.intel.com/products/75800/Intel-Xeon-Phi-Coprocessor-7120X-16GB-1_238-GHz-61-core}.
+
+\bibitem{tpu}
+TechPowerUp, ``{Intel} {Xeon} {Phi} {7120X} | {TechPowerUp} {GPU} {Database},''
+  2017.
+\newblock [Online; accessed 11-December-2017], available at
+  \url{https://www.techpowerup.com/gpudb/2481/xeon-phi-7120x}.
+
+\end{thebibliography}

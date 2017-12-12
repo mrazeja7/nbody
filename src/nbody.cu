@@ -2,14 +2,13 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-/* simulation_arrays.cpp */
+/* nbody.cu */
 /*
-a modified version of the OOP code. This time, I slightly redesigned the code
-from a "array of structures" style to a more cache-friendly "structure of arrays" design.
-In doing so, I got rid of both the Body and the Simulation classes completely, and just
-copied and pasted the source code. I left some of the getters for ease of use.
-I also got rid of the gif library and its handlers. I will use the OOP version of
-the implementation to create animations.
+	this is a version of the implementation that is supposed to be run on an NVIDIA GPU.
+	It's a rather straightforward design, with each body calculating its own force vector
+	from all other bodies in one thread. I think this is appropriate granularity-wise,
+	if I wanted to use a thread for every (i,j) pair I would potentially spawn 
+	trillions of threads, which is not favorable.
 */
 #include <iostream>
 #include <fstream>
@@ -76,7 +75,6 @@ __global__ void updateKernel(float *xPos, float *yPos, float *xVel, float *yVel,
 void optimizedUpdate() // estimated FLOP counts in comments on each line
 {
 	cudaError_t cudaStatus;
-	// 1 thread for now
 	uint64_t nblocks = (n + BLOCKSIZE - 1) / BLOCKSIZE;
 	updateKernel<<<nblocks, BLOCKSIZE>>>(xPos, yPos, xVel, yVel, mass, n);
 	cudaStatus = cudaGetLastError();
@@ -84,16 +82,6 @@ void optimizedUpdate() // estimated FLOP counts in comments on each line
 		cout << "update failed: " << cudaGetErrorString(cudaStatus) << endl;
 	cudaDeviceSynchronize();
 	currentTime++;
-
-	// used for debug purposes
-	/*float *tmp = new float[n];
-	cudaMemcpy(tmp, xPos, n * sizeof(float), cudaMemcpyDeviceToHost);
-	for (int i = 0; i < 10; i++)
-	{
-		cout << tmp[i] << " ";
-	}
-	cout << endl;*/
-	//delete[] tmp;
 }
 void setGifProps(int w, int h, int d)
 {
@@ -123,7 +111,7 @@ __global__ void initializeBodies(float *xPos, float *yPos, float *xVel, float *y
 	xVel[count - 1] = yVel[count - 1] = 0.0;
 }
 
-void randomBodies(uint64_t count)
+void randomBodies_onDev(uint64_t count) // initialize everything on the device using a different kernel
 {
 	cudaMalloc((void**)&xPos, count * sizeof(float));
 	cudaMalloc((void**)&yPos, count * sizeof(float));
@@ -131,13 +119,19 @@ void randomBodies(uint64_t count)
 	cudaMalloc((void**)&yVel, count * sizeof(float));
 	cudaMalloc((void**)&mass, count * sizeof(float));
 
-	// initialize everything on the device
+	// 1 thread is enough
 	initializeBodies << <1, 32 >> > (xPos, yPos, xVel, yVel, mass, count, gifW, gifH, unsigned(time(NULL)));
-	n = count;	
-	return;
+	n = count;
+}
 
-	// initialize on the host, then copy over to device
-	/*
+void randomBodies(uint64_t count) // initialize on the host, then copy over to device
+{
+	cudaMalloc((void**)&xPos, count * sizeof(float));
+	cudaMalloc((void**)&yPos, count * sizeof(float));
+	cudaMalloc((void**)&xVel, count * sizeof(float));
+	cudaMalloc((void**)&yVel, count * sizeof(float));
+	cudaMalloc((void**)&mass, count * sizeof(float));
+
 	default_random_engine generator;
 	std::uniform_int_distribution<int> xpos(-gifW / 2, gifW / 2);
 	std::uniform_int_distribution<int> ypos(-gifH / 2, gifH / 2);
@@ -173,7 +167,6 @@ void randomBodies(uint64_t count)
 	delete[] xVel_h;
 	delete[] yVel_h;
 	delete[] mass_h;
-	*/
 }
 
 void simulate(int bodies, int iters)

@@ -88,7 +88,7 @@
 			\textbf{f}_{ij} = K \frac{m_i m_j \cdot r_{ij}}{||r_{ij}||^2} 
 		\end{equation}
 		
-		where $m_i$ and $m_j$ are the respective masses of bodies $i$ and $j$; $r_{ij}$ is the length vector between bodies $i$ and $j$, i.e. $r_{ij} = x_j - x_i$, and $K$ is the gravitational constant used in the simulation. As you can see from the equation above, the force vector is not linear; instead, the relative force pulling on body $i$ diminishes with the square of distance between these two bodies (or the vector $r_{ij}$).
+		where $m_i$ and $m_j$ are the respective masses of bodies $i$ and $j$; $r_{ij}$ is the length vector between bodies $i$ and $j$, i.e. $r_{ij} = x_j - x_i$, and $K$ is the gravitational constant used in the simulation; $K = 6.674 \cdot 10^{-11}$ \cite{constant}. As you can see from the equation above, the force vector is not linear; instead, the relative force pulling on body $i$ diminishes with the square of distance between these two bodies (or the vector $r_{ij}$).
 		
 		The total force that acts on body $i$ - $\textbf{F}_i$ while it interacts with all other $\textbf{n}-1$ bodies, is given by the sum of all particular force vectors:
 		
@@ -101,6 +101,7 @@
 		Of course, being a brute-force algorithm, the asymptotic bound on computation time is not very good. Because the algorithm needs to touch all particle pairs during a single iteration of the computation, the time complexity is bounded by $O(k \cdot n^2)$, where $k$ is the number of iterations, or time steps we simulate for, and $n$ stands for the number of bodies there are in the given system.
 	
 	\subsection*{The Barnes-Hut algorithm}
+	\label{barnes}
 		
 		The Barnes-Hut algorithm offers a very different approach to solving the simulation in a timely, yet less accurate manner. This algorithm is a mere approximation of the N-Body simulation problem, which implies that it is best used when the running time of the computation is a significant constraint and the physical accuracy of the simulation is maybe not as important.
 	
@@ -145,11 +146,9 @@
 		
 	\section{Methods and facilities used}
 	
-	%TODO c++11 a chrono
-	
 		Before I started working on this semestral project, I planned to first implement a naive version of the brute-force N-Body simulation algorithm. Then I wanted to work iteratively in an effort to optimize the source code in order to take better advantage of a computer's memory hierarchy, more specifically the CPU's caches. 
 		
-		I decided to use the C++ programming language to write all of my source code where applicable, and for the CUDA part of my implementation, I would use NVIDIA's CUDA-C language, which is actually just C/C++ with a little bit of extra functionality.
+		I decided to use the C++ programming language to write all of my source code where applicable, and for the CUDA part of my implementation, I would use NVIDIA's CUDA-C language, which is actually just C/C++ with a little bit of extra functionality. I also took advantage of C++'s C++11 standard, which brings a lot of new features into the language compared to its previous versions. In order to get very accurate timing results during my benchmarking efforts, I used C++11's \texttt{<chrono>} library. I could have used other, older libraries to do this task, but I wanted to try a new approach, even when it comes to an area that probably doesn't offer much improvement anymore.
 		
 		Then I wanted to transform the code using the OpenMP parallel programming interface, and finally, if time permitted, create an implementation that would use NVIDIA's CUDA technology.
 		
@@ -237,14 +236,82 @@
 			
 			I decided to only pick a couple of data points - you can see the speedups when using $2-32$ threads when compared to just a sequentially run application with either $10, 20, 100 or 500$ thousand bodies, respectively. It is apparent that for large amounts of bodies, the speedups get even higher, reaching almost linear levels. The best speedup I measured when using 32 threads was $31.69$, which is extremely good and can't really be improved much further.
 			
-			The sometimes amazing speedups I measured are definitely due to the embarassingly parallel nature of the brute-force N-Body simulation algorithm, but also due to the high efficiency of all compiler optimizations, vectorization and the OpenMP interface.
+			The sometimes amazing speedups I measured are definitely due to the embarrassingly parallel nature of the brute-force N-Body simulation algorithm, but also due to the high efficiency of all compiler optimizations, vectorization and the OpenMP interface.
 			
-		\section{Project progress: Intel Xeon Phi}
-			
-		\section{Issue: ARM-based device}
+	\section{Project progress: Intel Xeon Phi}
+	\label{phisection}
 		
+		After I was dont with the implementation and benchmarking of the OpenMP parallel version of the N-Body simulation project, it was time to start rewriting the program once again for use on the Intel Xeon Phi coprocessor card.
+		
+		The exact piece of hardware I used was a Xeon Phi 7120X. It is based on the Knight's Corner architecture, which was unveiled in 2013. It is indeed not the freshest piece of hardware, but it will do just fine.
+		According to Intel's specifications page, ARK\cite{ark}, this specific coprocessor card contains 61 independent CPU cores, each clocked at $1.24$ to $1.33$ GHz. It also features a different type of Hyper-Threading technology than Intel's typical CPUs, as each core takes care of up to 4 threads at once. This means that your program can effectively take up 224 threads in all. It also has 16 gigabytes of GDDR5 memory and a 512-bit memory bus. The theoretical maximum floating-point performance of this particular Phi is $650.5$ GFLOPs/s \cite{tpu}.
+		
+		I ran all benchmarks that were using this device on a small computing cluster back at my home university, the Faculty of Electrical Engineering of the Czech Technical University.
+		
+		\subsection*{Implementation specifics}
+		
+			Since the source code that I'd developed until this point was already pretty solid when it came to efficient memory usage, I didn't have to change the code too heavily in order to use the Xeon Phi coprocessor efficiently. As the Xeon Phi largely uses OpenMP, I was able to left the parallelised code I had written earlier in with no modifications. I mainly added some additional directives that helped the device and Intel's compiler link the code. I opted to align all data arrays in order to help take advantage of vectorization; I used the \texttt{\_\_attribute\_\_((aligned(256)))} clause when defining each property array to let the compiler know that the corresponding data is properly aligned and can be safely vectorized.
+			
+		\subsection*{Resulting results and speedups}
+		
+			Benchmarking the Xeon Phi-friendly code was pretty straightforward. I mostly recycled all of the benchmarking scripts that I used in my previous tests. 
+			
+			I used dataset sizes that were identical to all of my previous benchmarks, and after I measured all running times and calculated the resulting performance in GFLOPs/s, I made the chart you can see in figure \ref{phi32}. In it, I made a simple bar graph that illustrates the difference in performance between the Xeon Phi version of my simulation and the previous OpenMP implementation running on 32 threads on a typical x86-64 architecture.
+			
+			Even though the Xeon Phi uses nearly 8 times the number of threads, it only managed to be approximately $2.3$ times as fast as the regular CPU. This is definitely caused by the whole nature of this architecture; instead of a relatively small number of very complex CPU cores, the Xeon Phi relies on a bigger number of very simple cores which operate over a shared memory. It also runs at a much slower clock rate, about a third to a half of that of the regular Xeon CPUs that I used for my previous tests. Its microarchitecture is also quite a bit older than the CPUs I used, which also causes a non-insignificant performance difference.
+			
+			When taking into consideration the device's maximum floating-point performance of $650.5$ GFLOPs/s, my maximum achieved performance of $393$ GFLOPs/s is really good. It only reaffirmed the fact that the brute-force N-Body simulation algorithm is computationally not very complex and quite embarrassingly parallel.
+			
+			Even though the overall running times compared to a "regular" CPU architecture weren't as impressive as I had hoped, I am still glad I could measure the differences between these two wildly different architectures.
+		
+	\section{Issue: ARM-based device}
+	\label{orangepi}
+	
+		The next part of my project was the addition of results to be gathered from running benchmarks on a device equipped with an ARM-architecture based CPU. For this part of the project, I had picked an OrangePi One development board. This board has a quad-core Allwinner H3 SoC clocked at approximately $1.2$ GHz, 512 megabytes of memory and a TDP of approximately 10 watts. I was looking forward to seeing just how much slower this architecture is to any other kind of contemporary architecture.
+		
+		I ran into quite a big issue, though; the OrangePi device I owned and planned to use ended up not being reachable via \texttt{ssh}. After investigating further, it turns the power supply part of its circuitry had failed and thus it wouldn't run at all. I ended up not bothering trying to revive the device and just skip this part of the project altogether. Take these two paragraphs as a sort of an excuse for any results that are missing.
+	
+	\section{Project progress: CUDA implementation}
+	\label{cudasection}
+	
+		After I was done with all other benchmarks (excluding the ARM architecture for reasons mentioned earlier), I proceeded to create one last implementation of the brute-force N-Body simulation algorithm. This time, I used the CUDA-C language to make a version of the algorithm that could be run on NVIDIA GPUs.
+		
+		Running any kind of scientific calculations on GPUs is incredibly time-efficient these days, especially so if the calculations are simple in nature and significantly parallel. That is why this algorithm was very suitable to receive a CUDA implementation.
+		
+		\subsection*{Implementation specifics}
+		
+			The main thing to think about when designing a GPU-based application is the scheduling of threads, and memory management. It is usually a very good practice to chop the tasks that need to be processed into many very small parts and run them all in a massively parallel fashion.
+			
+			I prepared all of the initial values for the given simulation system using the CPU and main memory, then I proceeded to copy all of those arrays into the graphics card's memory. After these initial steps were done, I simply created a thread for each of the bodies. Each of these threads then looped over all other $n-1$ bodies in the system and calculated all resulting force vectors. Once this calculation was done, the thread simply updated the corresponding body's property arrays.
+			
+			When running CUDA kernels on a GPU, it is important to select the right number of blocks and their corresponding size in number of threads. I chose a blocksize of 512, since this value is what I learned is probably the best from my previous homeworks in the CIS 750 course.
+			
+		\subsection*{Resulting results and speedups}
+		
+		%TODO vysledky benchmarku, grafy
+			
+			I originally wanted to run this CUDA code on one of Beocat's GPU-equipped nodes. These nodes feature a state-of-the-art NVIDIA GTX 1080 Ti graphics card, which is one of the fastest consumer-grade graphics cards available today. However, after my benchmarking scripts had been waiting in Beocat's task queue for a week, I turned to benchmarking the application using other, more readily available GPUs.
+
+
+	\section{Conclusion}
+	
+		In this course project for the CIS 750 - Advanced Computer Architecture Experiments course at Kansas State University, I tasked myself with implementing multiple versions of a brute-force or all-pairs algorithm that solves the N-Body simulation problem.
+		
+		I implemented a naive and an optimized implementation of this algorithm at first, in both sequential and parallel versions, the latter ones using the OpenMP parallel programming interface. I then continued to create an implementation that could be run on the Intel Xeon Phi coprocessor (section \ref{phisection}), and another implementation that could be run on NVIDIA's graphics processing units using CUDA technology (\ref{cudasection}). I performed all of these implementations in either C++ or CUDA-C (CUDA implementation only). In section \ref{orangepi}, I explained an issue I had with one of my proposed project parts and why I decided to skip a part of the project altogether. 
+		
+		For each of these implementations, I created test scripts and used those to benchmark the application on a vast variety of dataset sizes and thread counts. I measured the running times and overall computing performance of each version of the source code.
+		
+		After the benchmarking was all done, I pooled all the resulting data that I gathered, analyzed it and commented on my findings. I largely confirmed my hypotheses that sacrificing code readability by using a Structure of Arrays kind of memory design would bring noticeable performance improvements, and that, as I showed in section \ref{phisection}, using a Xeon Phi coprocessor would yield solid speedups, despite the exact model I used in my project being quite old and relatively slow.
+		
+		I also found that using CUDA technology for this kind of simulation is indeed a very good idea and that its performance is very respectable.
+		
+		I wish I could have tried to benchmark an ARM-architecture based device as well, but time management and an unexpected hardware failure forced me to not perform any tests on such a device.
+		
+		In the future, I think it would be beneficial to repeat the project using the Barnes-Hut algorithm (that I briefly described in section \ref{barnes}) and re-run all the benchmarks, just to see how much more efficient it really is, even if it's not as embarrassingly parallel as the brute-force algorithm.
 		
 	
+	\bibliographystyle{ieeetr}
+	\bibliography{mybibliographyfile}
 	%=====================================================	
 \end{document}
 
