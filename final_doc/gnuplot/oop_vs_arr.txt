@@ -1,0 +1,14 @@
+#set terminal pngcairo nocrop enhanced font "arial,14" size 800,500
+set key left top
+#set output 'oop_vs_arr.png'
+set term eps font "verdana,15"
+set output "oop_vs_arr.eps"
+set style data histograms
+set boxwidth 0.8
+set style fill solid
+set title "OOP vs SOA design GFLOPs/s, 1 core"
+set ylabel "GFLOPs/s" offset 2,0,0
+set xlabel "n"
+#set xtics nomirror rotate by -45
+plot "oop_vs_arr.dat" using 2:xtic(1) title "OOP" lt rgb "#5082C0",\
+	"" using 3 title "SOA" lt rgb "#C05050"

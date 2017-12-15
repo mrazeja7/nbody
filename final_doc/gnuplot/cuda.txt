@@ -1,0 +1,20 @@
+#set terminal pngcairo nocrop enhanced font "arial,10" size 400,300
+#set output "cuda.png"
+set key top left
+set term eps font "verdana,15"
+set output "cuda.eps"
+#set decimal ","
+
+set title "Overall performance comparison,\nIntel Xeon Phi vs NVIDIA CUDA"
+set ylabel "GFLOPs/s" offset 2,0,0
+set xlabel "n"
+
+set xtics ('5k' 0,'10k' 1,'20k' 2,'30k' 3,'40k' 4, '50k' 5, '60k' 6, '70k' 7, '80k' 8, '90k' 9, '100k' 10, '200k' 11, '300k' 12, '400k' 13, '500k' 14, '600k' 15, '700k' 16, '800k' 17, '900k' 18, '1m' 19)
+
+set style line 1 lc rgb "#5082C0" lt 1.5 lw 10 pt 7 ps 0.5
+set style line 2 lc rgb "#20A050" lt 1.5 lw 10 pt 7 ps 0.5
+
+set xtics nomirror rotate by -45
+
+plot "cuda.dat" using 2 title "Xeon Phi, 224 threads" with linespoints ls 1,\
+	"" using 3 title "CUDA, GTX 1060" with linespoints ls 2

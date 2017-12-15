@@ -1,0 +1,14 @@
+#set terminal pngcairo nocrop enhanced font "arial,8" size 400,300
+#set output 'phi_vs_32.png'
+set term eps font "verdana,15"
+set output "phi_vs_32.eps"
+set key left top
+set style data histograms
+set boxwidth 0.8
+set style fill solid
+set title "32-thread CPU vs Xeon Phi, GFLOPs/s"
+set ylabel "GFLOPs/s" offset 1.5,0,0
+set xlabel "n"
+set xtics rotate by -45
+plot "phi_vs_32.dat" using 2:xtic(1) title "Xeon CPU, 32 threads" lt rgb "#5082C0",\
+	"" using 3 title "Xeon Phi, 224 threads" lt rgb "#C05050"

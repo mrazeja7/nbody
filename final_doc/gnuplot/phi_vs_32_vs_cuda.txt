@@ -1,0 +1,13 @@
+set terminal pngcairo nocrop enhanced font "arial,10" size 800,500
+set key left top
+set output 'phi_vs_32_vs_cuda.png'
+set style data histograms
+set boxwidth 0.8
+set style fill solid
+set title "32-thread CPU vs Xeon Phi, GFLOPs/s"
+set ylabel "GFLOPs/s"
+set xlabel "n"
+#set xtics nomirror rotate by -45
+plot "phi_vs_32_vs_cuda.dat" using 2:xtic(1) title "Xeon CPU, 32 threads" lt rgb "#5082C0",\
+	"" using 3 title "Xeon Phi, 224 threads" lt rgb "#C05050",\
+	"" using 4 title "NVIDIA CUDA, GTX 1060" lt rgb "#20A050"

@@ -1,0 +1,22 @@
+#set terminal pngcairo nocrop enhanced font "arial,10" size 400,300
+#set output "speedup.png"
+set key top left
+set term eps font "verdana,15"
+set output "speedup.eps"
+#set decimal ","
+
+set title "Speedups of different thread counts depending \non data size (body count)"
+set ylabel "Speedup" offset 1.5,0,0
+set xlabel "Threads"
+
+set style line 1 lc rgb "#5082C0" lt 1 lw 10 pt 7 ps 0.5
+set style line 2 lc rgb "#C05050" lt 1 lw 10 pt 7 ps 0.5
+set style line 3 lc rgb "#333333" lt 1 lw 10 pt 7 ps 0.5
+set style line 4 lc rgb "#20A050" lt 1 lw 10 pt 7 ps 0.5
+
+set xtics ('2' 0,'4' 1,'8' 2,'16' 3,'32' 4)
+
+plot "speedup.dat" index 0 title "10k" with linespoints ls 1, \
+"" index 1 title "20k" with linespoints ls 2,\
+"" index 2 title "200k" with linespoints ls 3,\
+"" index 3 title "500k" with linespoints ls 4,\

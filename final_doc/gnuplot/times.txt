@@ -1,0 +1,24 @@
+set terminal pngcairo nocrop enhanced font "arial,10" size 400,300
+set output "times.png"
+set key top left
+#set term eps
+#set output "times.eps"
+#set decimal ","
+
+set title "Running times of different implementations"
+set ylabel "Running times [s]"
+set xlabel "n"
+
+set yrange[0:200]
+
+set style line 1 lc rgb "#C05050" lt 1.5 lw 4 pt 7 ps 0.5
+set style line 2 lc rgb "#5082C0" lt 1.5 lw 4 pt 7 ps 0.5
+set style line 3 lc rgb "#333333" lt 1.5 lw 4 pt 7 ps 0.5
+set style line 4 lc rgb "#20A050" lt 1.5 lw 4 pt 7 ps 0.5
+
+set xtics ('10k' 0,'20k' 1,'50k' 2,'100k' 3,'1m' 4)
+
+plot "times.dat" index 0 title "Sequential" with linespoints ls 1, \
+"" index 1 title "Xeon CPU, 32 threads" with linespoints ls 2,\
+"" index 2 title "Xeon Phi, 224 threads" with linespoints ls 3,\
+"" index 3 title "NVIDIA CUDA, GTX 1060" with linespoints ls 4,\

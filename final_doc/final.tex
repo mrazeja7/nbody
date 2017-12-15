@@ -211,7 +211,7 @@
 			
 			\begin{figure}[ht]			
 				\centering
-				\includegraphics[width=.45\textwidth]{oop_vs_soa.png}
+				\includegraphics[width=.5\textwidth]{gnuplot/oop_vs_arr.eps}
 				\caption{\label{oopsoa}Performance comparison of OOP vs SOA approaches}
 			\end{figure} 
 	
@@ -230,11 +230,11 @@
 			
 			\begin{figure}[ht]			
 				\centering
-				\includegraphics[width=.45\textwidth]{parspeedup.png}
+				\includegraphics[width=.5\textwidth]{gnuplot/speedup.eps}
 				\caption{\label{parspeedup}Parallel speedups when using OpenMP depending on number of threads and bodies}
 			\end{figure} 
 			
-			I decided to only pick a couple of data points - you can see the speedups when using $2-32$ threads when compared to just a sequentially run application with either $10, 20, 100 or 500$ thousand bodies, respectively. It is apparent that for large amounts of bodies, the speedups get even higher, reaching almost linear levels. The best speedup I measured when using 32 threads was $31.69$, which is extremely good and can't really be improved much further.
+			I decided to only pick a couple of data points - you can see the speedups when using $2-32$ threads when compared to just a sequentially run application with either $10$, $20$, $100$ or $500$ thousand bodies, respectively. It is apparent that for large amounts of bodies, the speedups get even higher, reaching almost linear levels. The best speedup I measured when using 32 threads was $31.69$, which is extremely good and can't really be improved much further.
 			
 			The sometimes amazing speedups I measured are definitely due to the embarrassingly parallel nature of the brute-force N-Body simulation algorithm, but also due to the high efficiency of all compiler optimizations, vectorization and the OpenMP interface.
 			
@@ -258,7 +258,13 @@
 			
 			I used dataset sizes that were identical to all of my previous benchmarks, and after I measured all running times and calculated the resulting performance in GFLOPs/s, I made the chart you can see in figure \ref{phi32}. In it, I made a simple bar graph that illustrates the difference in performance between the Xeon Phi version of my simulation and the previous OpenMP implementation running on 32 threads on a typical x86-64 architecture.
 			
-			Even though the Xeon Phi uses nearly 8 times the number of threads, it only managed to be approximately $2.3$ times as fast as the regular CPU. This is definitely caused by the whole nature of this architecture; instead of a relatively small number of very complex CPU cores, the Xeon Phi relies on a bigger number of very simple cores which operate over a shared memory. It also runs at a much slower clock rate, about a third to a half of that of the regular Xeon CPUs that I used for my previous tests. Its microarchitecture is also quite a bit older than the CPUs I used, which also causes a non-insignificant performance difference.
+			\begin{figure}[ht]			
+				\centering
+				\includegraphics[width=.5\textwidth]{gnuplot/phi_vs_32.eps}
+				\caption{\label{32_vs_phi} DODELAT} %TODO}
+			\end{figure} 
+			
+			Even though the Xeon Phi uses nearly 8 times the number of threads, it only managed to be approximately $2.3$ times as fast as the regular CPU. This is definitely caused by the whole nature of this architecture; instead of a relatively small number of very complex CPU cores, the Xeon Phi relies on a bigger number of very simple cores which operate over a shared memory. It also runs at a much slower clock rate, about a third to a half of that of the regular Xeon CPUs that I used for my previous tests. Its microarchitecture is also quite a bit older than the CPUs I used, which also causes a non-insignificant performance difference.			
 			
 			When taking into consideration the device's maximum floating-point performance of $650.5$ GFLOPs/s, my maximum achieved performance of $393$ GFLOPs/s is really good. It only reaffirmed the fact that the brute-force N-Body simulation algorithm is computationally not very complex and quite embarrassingly parallel.
 			
@@ -282,7 +288,9 @@
 		
 			The main thing to think about when designing a GPU-based application is the scheduling of threads, and memory management. It is usually a very good practice to chop the tasks that need to be processed into many very small parts and run them all in a massively parallel fashion.
 			
-			I prepared all of the initial values for the given simulation system using the CPU and main memory, then I proceeded to copy all of those arrays into the graphics card's memory. After these initial steps were done, I simply created a thread for each of the bodies. Each of these threads then looped over all other $n-1$ bodies in the system and calculated all resulting force vectors. Once this calculation was done, the thread simply updated the corresponding body's property arrays.
+			After allocating enough memory on the device to hold each of the property arrays, I run a function that creates and randomly seeds a random number generator. I used NVIDIA's \texttt{curand.h} header file for this functionality. The seeding and generation take place on the device itself, though they are not counted when measuring the running time during benchmarking (to be fair, the same processes running on any other architecture in this project are not counted either).
+			
+			After these initial steps were done, I simply launched a kernel and created a thread for each of the bodies. Each of these threads then looped over all other $n-1$ bodies in the system and calculated all resulting force vectors. Once this calculation was done, the thread simply updated the corresponding body's property arrays.
 			
 			When running CUDA kernels on a GPU, it is important to select the right number of blocks and their corresponding size in number of threads. I chose a blocksize of 512, since this value is what I learned is probably the best from my previous homeworks in the CIS 750 course.
 			
@@ -291,9 +299,19 @@
 		%TODO vysledky benchmarku, grafy
 			
 			I originally wanted to run this CUDA code on one of Beocat's GPU-equipped nodes. These nodes feature a state-of-the-art NVIDIA GTX 1080 Ti graphics card, which is one of the fastest consumer-grade graphics cards available today. However, after my benchmarking scripts had been waiting in Beocat's task queue for a week, I turned to benchmarking the application using other, more readily available GPUs.
+			
+			I used a GeForce GTX 1060 graphics card in one of my housemates' personal computer. Even though this GPU only has about one third of the GTX 1080 Ti's power, I was still expecting a solid speedup over a typical multithreaded CPU and Xeon Phi implementations.
+			
+			\begin{figure}[ht]			
+				\centering
+				\includegraphics[width=.5\textwidth]{gnuplot/cuda.eps}
+				\caption{\label{cuda} DODELAT} %TODO}
+			\end{figure} 
 
 
 	\section{Conclusion}
+	
+	%TODO graf casu (excel - times)
 	
 		In this course project for the CIS 750 - Advanced Computer Architecture Experiments course at Kansas State University, I tasked myself with implementing multiple versions of a brute-force or all-pairs algorithm that solves the N-Body simulation problem.
 		

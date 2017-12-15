@@ -6,9 +6,6 @@ from all other bodies in one thread. I think this is appropriate granularity-wis
 if I wanted to use a thread for every (i,j) pair I would potentially spawn
 trillions of threads, which is not favorable.
 */
-
-// nvcc -std=c++11 -o cuda_nbody nbody.cu -ccbin="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.11.25503\bin"
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -33,7 +30,7 @@ int n;
 int currentTime;
 int32_t gifW, gifH, gifDelay;
 float timeInSeconds;
-double gflops;
+float gflops;
 int getCurrentTime()
 {
 	return currentTime;
@@ -75,13 +72,13 @@ void optimizedUpdate() // estimated FLOP counts in comments on each line
 {
 	cudaError_t cudaStatus;
 	int nblocks = (n + BLOCKSIZE - 1) / BLOCKSIZE;
-	//cout << "attempting to start kernel,  " << nblocks << " " << BLOCKSIZE << endl;
+	cout << "attempting to start kernel,  " << nblocks << " " << BLOCKSIZE << endl;
 	updateKernel << <nblocks, BLOCKSIZE >> >(xPos, yPos, xVel, yVel, mass, n);
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
 		cout << "update failed: " << cudaGetErrorString(cudaStatus) << endl;
 
-	//cout << "kernel should be running " << endl;
+	cout << "kernel should be running " << endl;
 	cudaDeviceSynchronize();
 	currentTime++;
 }
@@ -98,9 +95,9 @@ __global__ void initializeBodies(float *xPos, float *yPos, float *xVel, float *y
 	if (threadID >= count)
 		return;
 	curandState_t state;
-	curand_init(seed+threadID, 0, 0, &state);
+	curand_init(seed, 0, 0, &state);
 
-	if (threadID != count - 1)
+	if (threadID != count-1)
 	{
 		xPos[threadID] = curand_uniform(&state) * w - w / 2;
 		yPos[threadID] = curand_uniform(&state) * h - h / 2;
@@ -116,29 +113,19 @@ __global__ void initializeBodies(float *xPos, float *yPos, float *xVel, float *y
 	}
 }
 
-void randomBodies_onDev(int count) // initialize everything on the device using a different kernel
+void randomBodies_onDev_(int count) // initialize everything on the device using a different kernel
 {
 	cudaError_t cudaStatus;
-	cudaStatus = cudaMalloc((void**)&xPos, count * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-		cout << "malloc failed: " << cudaGetErrorString(cudaStatus) << endl;
-	cudaStatus = cudaMalloc((void**)&yPos, count * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-		cout << "malloc failed: " << cudaGetErrorString(cudaStatus) << endl;
-	cudaStatus = cudaMalloc((void**)&xVel, count * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-		cout << "malloc failed: " << cudaGetErrorString(cudaStatus) << endl;
-	cudaStatus = cudaMalloc((void**)&yVel, count * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-		cout << "malloc failed: " << cudaGetErrorString(cudaStatus) << endl;
-	cudaStatus = cudaMalloc((void**)&mass, count * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-		cout << "malloc failed: " << cudaGetErrorString(cudaStatus) << endl;
+	cudaMalloc((void**)&xPos, count * sizeof(float));
+	cudaMalloc((void**)&yPos, count * sizeof(float));
+	cudaMalloc((void**)&xVel, count * sizeof(float));
+	cudaMalloc((void**)&yVel, count * sizeof(float));
+	cudaMalloc((void**)&mass, count * sizeof(float));
 
 	// 1 thread is enough
 	int nblocks = (count + BLOCKSIZE - 1) / BLOCKSIZE;
 	initializeBodies << <nblocks, BLOCKSIZE >> > (xPos, yPos, xVel, yVel, mass, count, gifW, gifH, unsigned(time(NULL)));
-
+	
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
 		cout << "kernel failed: " << cudaGetErrorString(cudaStatus) << endl;
@@ -147,7 +134,7 @@ void randomBodies_onDev(int count) // initialize everything on the device using 
 	n = count;
 }
 
-void randomBodies_onDev_verbose(int count) // initialize everything on the device using a different kernel
+void randomBodies_onDev(int count) // initialize everything on the device using a different kernel
 {
 	cout << "starting malloc" << endl;
 	cudaError_t cudaStatus;
@@ -168,14 +155,13 @@ void randomBodies_onDev_verbose(int count) // initialize everything on the devic
 	// 1 thread is enough
 	int nblocks = (count + BLOCKSIZE - 1) / BLOCKSIZE;
 	initializeBodies << <nblocks, BLOCKSIZE >> > (xPos, yPos, xVel, yVel, mass, count, gifW, gifH, unsigned(time(NULL)));
-
+	
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
 		cout << "kernel failed: " << cudaGetErrorString(cudaStatus) << endl;
 
 	cudaDeviceSynchronize();
 	n = count;
-	cout << count << " bodies " << getCount() << endl;
 }
 
 void randomBodies(int count) // initialize on the host, then copy over to device
@@ -226,7 +212,7 @@ void randomBodies(int count) // initialize on the host, then copy over to device
 void checkBodies()
 {
 	float *tmp = new float[100];
-	cudaMemcpy(tmp, xPos, 100 * sizeof(float), cudaMemcpyDeviceToHost);
+	cudaMemcpy(tmp, xVel, 100 * sizeof(float), cudaMemcpyDeviceToHost);
 
 	for (size_t i = 0; i < 20; i++)
 	{
@@ -235,33 +221,28 @@ void checkBodies()
 	cout << endl;
 }
 
-void simulate(int bodies, int iters)
+void simulate_(int bodies, int iters)
 {
 	setGifProps(1024, 1024, 1);
 	randomBodies_onDev(bodies);
-	//cout << "generated on dev" << endl;
+	cout << "generated on dev" << endl;
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 	for (int i = 0; i < iters; ++i)
 		optimizedUpdate();
 
 	float finish = duration_cast<duration<float>>(high_resolution_clock::now() - start).count();
 	// (19*(n-1) + 14)*n*k total floating point operations == (19n-5)*n*k
-	uint64_t appxFlops = (19 * bodies) - 5;
-	appxFlops = appxFlops*bodies*iters;
+	int appxFlops = (19 * getCount() - 5)*getCount()*iters;
+	timeInSeconds = finish;
 	gflops = 1e-9 * appxFlops / finish;
-	cout << "CUDA\t" << bodies << "\t" << iters << "\t" << finish << "\t" << gflops << endl;
-	cudaFree(xPos);
-	cudaFree(yPos);
-	cudaFree(xVel);
-	cudaFree(yVel);
-	cudaFree(mass);
+	cout << "sim done" << endl;
 }
 
-void simulate_verbose(int bodies, int iters)
+void simulate(int bodies, int iters)
 {
 	setGifProps(1024, 1024, 1);
 	cout << "set gif" << endl;
-	randomBodies_onDev_verbose(bodies);
+	randomBodies_onDev(bodies);
 	cout << "generated on dev" << endl;
 	high_resolution_clock::time_point start = high_resolution_clock::now();
 	for (int i = 0; i < iters; ++i)
@@ -270,41 +251,27 @@ void simulate_verbose(int bodies, int iters)
 
 	float finish = duration_cast<duration<float>>(high_resolution_clock::now() - start).count();
 	// (19*(n-1) + 14)*n*k total floating point operations == (19n-5)*n*k
-	uint64_t appxFlops = (19 * bodies) - 5;
-	cout << appxFlops << endl;
-	appxFlops = appxFlops*bodies*iters;
+	int appxFlops = (19 * getCount() - 5)*getCount()*iters;
 	timeInSeconds = finish;
-	gflops = 1e-9 * (double)appxFlops / finish;
-	cout << "sim done " << appxFlops << " " << (((19 * bodies) - 5)*bodies)*iters << endl;
-}
-
-void allTests()
-{
-	simulate(5000,1);
-	for (size_t i = 1; i < 10; i++)
-		simulate(i * 10000, 1);
-
-	for (size_t i = 1; i <= 10; i++)
-		simulate(i * 100000, 1);
+	gflops = 1e-9 * appxFlops / finish;
+	cout << "sim done" << endl;
 }
 
 int main(int argc, char **argv)
 {
 	//cout << "Number of bodies: ";
-	//int b;
-	//cin >> b;
+	int b;
+	cin >> b;
 	//cout << "Number of iterations: ";
-	//int k;
-	//cin >> k;
+	int k;
+	cin >> k;
 
-	//cout << "CUDA" << /*" threads\t"*/"\t";
-	//simulate_(b, k);
-	//cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */ << endl;
+	cout << "CUDA" << /*" threads\t"*/"\t";
+	simulate(b, k);
+	cout << getCount() << /*" bodies\t"*/"\t" << getCurrentTime() << /*" iterations\t"*/"\t" << timeInSeconds << /*" seconds\t"*/"\t" << gflops /*<< " GFlops/s." */ << endl;
 	//cout << getCount() << " bodies\n" << getCurrentTime() << " iterations\n" << timeInSeconds << " seconds\n" << gflops << " GFlops/s." << endl;
 
-	//checkBodies();
+	checkBodies();
 	//system("PAUSE");
-
-	allTests();
 	return 0;
 }
