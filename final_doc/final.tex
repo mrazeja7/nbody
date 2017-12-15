@@ -54,11 +54,9 @@
 	
 	\section{Problem definition}
 	
-	\subsection*{The N-Body simulation}
-	
-		The N-body simulation is a way to simulate continuous gravitational interactions among potentially very large amounts of galactic bodies, solar systems and similar particles, where every single body influences the positions and velocity vectors of all other bodies. It is a tool that is used widely and frequently in the fields of astronomy and astrophysics to help researches reach a better understanding of the evolution of a large-scale structure of the universe.\cite{scholarpedia}
+		\subsection*{The N-Body simulation}
 		
-	\newpage
+			The N-body simulation is a way to simulate continuous gravitational interactions among potentially very large amounts of galactic bodies, solar systems and similar particles, where every single body influences the positions and velocity vectors of all other bodies. It is a tool that is used widely and frequently in the fields of astronomy and astrophysics to help researches reach a better understanding of the evolution of a large-scale structure of the universe.\cite{scholarpedia}		
 	
 	\section{Problem background and scope}
 	\label{algs}
@@ -71,61 +69,61 @@
 			
 			If we needed to run a truly massive (hundreds of millions to billions of space bodies) N-Body movement simulation for a high amount of iterations, it would be best to choose the Barnes-Hut algorithm. If instead we prioritize complete accuracy of all computations above all and don't really mind extremely long running times on the same amount of bodies for the same amount of iterations, it is best to stick with an algorithm that solves the simulation in a brute-force, but accurate manner.
 	
-	\begin{figure}[ht]
-		\centering
-		\includegraphics[width=0.5\textwidth]{sandbox2.jpg}
-		\caption{An illustration of an orbital timelapse in \textit{Universe Sandbox$^2$}}
-		\cite{nbodypic}
-	\end{figure} 
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=0.5\textwidth]{sandbox2.jpg}
+			\caption{An illustration of an orbital timelapse in \textit{Universe Sandbox$^2$}}
+			\cite{nbodypic}
+		\end{figure} 
 	
-	\subsection*{Brute-Force algorithm}
-		The most obvious and most accurate algorithm of solving the N-body simulation is simply a brute-force approach. This algorithm makes sure to compute the forces that are being applied between all pairs of space particles within a given system, thus ensuring scientifically correct movements. This algorithm is also sometimes called "the all-pairs N-Body simulation algorithm."
+		\subsection*{Brute-Force algorithm}
+			The most obvious and most accurate algorithm of solving the N-body simulation is simply a brute-force approach. This algorithm makes sure to compute the forces that are being applied between all pairs of space particles within a given system, thus ensuring scientifically correct movements. This algorithm is also sometimes called "the all-pairs N-Body simulation algorithm."
+			
+			In the computation of each iteration, or time step, we calculate force vectors $\textbf{f}_{ij}$. $\textbf{f}_{ij}$ signifies the force that is applied on body $i$ caused by its gravitational pull on a different body $j$. 
+			
+			Given $\textbf{n}$ bodies with an initial position vector $\textbf{p}_{i}$ for 1$ \leq i \leq \textbf{n}$, the force vector $\textbf{f}_{ij}$ is given by the following formula \cite{nvidia-article}:
+			
+			\begin{equation}
+			\centering
+				\textbf{f}_{ij} = K \frac{m_i m_j \cdot r_{ij}}{||r_{ij}||^2} 
+			\end{equation}
+			
+			where $m_i$ and $m_j$ are the respective masses of bodies $i$ and $j$; $r_{ij}$ is the length vector between bodies $i$ and $j$, i.e. $r_{ij} = p_j - p_i$, and $K$ is the gravitational constant used in the simulation; $K = 6.674 \cdot 10^{-11}$ \cite{constant}. As you can see from the equation above, the force vector is not linear; instead, the relative force pulling on body $i$ diminishes with the square of distance between these two bodies (or the vector $r_{ij}$).
+			
+			The total force that acts on body $i$ - $\textbf{F}_i$ - while it interacts with all other $\textbf{n}-1$ bodies, is given by the sum of all particular force vectors:
+			
+			\begin{equation}
+			\centering
+				\textbf{F}_i = \sum_{j = 1}^{N}\textbf{f}_{ij}
+				 = K m_i \sum_{j = 1}^{N}{\frac{m_j \cdot r_{ij}}{||r_{ij}||^2}}
+			\end{equation}
+			
+			\subsection*{Time complexity}
+			
+				Of course, being a brute-force algorithm, the asymptotic bound on computation time is not very good. Because the algorithm needs to touch all particle pairs during a single iteration of the computation, the time complexity is bounded by $O(k \cdot n^2)$, where $k$ is the number of iterations, or time steps we simulate for, and $n$ stands for the number of bodies there are in the given system.
 		
-		In the computation of each iteration, or time step, we calculate force vectors $\textbf{f}_{ij}$. $\textbf{f}_{ij}$ signifies the force that is applied on body $i$ caused by its gravitational pull on a different body $j$. 
+		\subsection*{Barnes-Hut algorithm}
+		\label{barnes}
+			
+			The Barnes-Hut algorithm offers a very different approach to solving the simulation in a timely, yet less accurate manner. This algorithm is a mere approximation of the N-Body simulation problem, which implies that it is best used when the running time of the computation is a significant constraint and the physical accuracy of the simulation is maybe not as important.
 		
-		Given $\textbf{n}$ bodies with an initial position vector $\textbf{p}_{i}$ for 1$ \leq i \leq \textbf{n}$, the force vector $\textbf{f}_{ij}$ is given by the following formula \cite{nvidia-article}:
-		
-		\begin{equation}
-		\centering
-			\textbf{f}_{ij} = K \frac{m_i m_j \cdot r_{ij}}{||r_{ij}||^2} 
-		\end{equation}
-		
-		where $m_i$ and $m_j$ are the respective masses of bodies $i$ and $j$; $r_{ij}$ is the length vector between bodies $i$ and $j$, i.e. $r_{ij} = p_j - p_i$, and $K$ is the gravitational constant used in the simulation; $K = 6.674 \cdot 10^{-11}$ \cite{constant}. As you can see from the equation above, the force vector is not linear; instead, the relative force pulling on body $i$ diminishes with the square of distance between these two bodies (or the vector $r_{ij}$).
-		
-		The total force that acts on body $i$ - $\textbf{F}_i$ - while it interacts with all other $\textbf{n}-1$ bodies, is given by the sum of all particular force vectors:
-		
-		\begin{equation}
-		\centering
-			\textbf{F}_i = \sum_{j = 1}^{N}\textbf{f}_{ij}
-			 = K m_i \sum_{j = 1}^{N}{\frac{m_j \cdot r_{ij}}{||r_{ij}||^2}}
-		\end{equation}
-		
-		\subsection*{Time complexity}
-		
-			Of course, being a brute-force algorithm, the asymptotic bound on computation time is not very good. Because the algorithm needs to touch all particle pairs during a single iteration of the computation, the time complexity is bounded by $O(k \cdot n^2)$, where $k$ is the number of iterations, or time steps we simulate for, and $n$ stands for the number of bodies there are in the given system.
-		
-	\subsection*{Barnes-Hut algorithm}
-	\label{barnes}
-		
-		The Barnes-Hut algorithm offers a very different approach to solving the simulation in a timely, yet less accurate manner. This algorithm is a mere approximation of the N-Body simulation problem, which implies that it is best used when the running time of the computation is a significant constraint and the physical accuracy of the simulation is maybe not as important.
+			The Barnes-Hut algorithm divides the whole space of the given system into different quadrant cells. The algorithm then only calculates the forces between particles within a single cell, not taking into consideration any other single particles. For quadrant cells where the number of bodies occupying it is particularly small, the brute-force algorithm is used to solve the simulation instead, as it is inefficient to divide the space within the quadrant cell any more.
 	
-		The Barnes-Hut algorithm divides the whole space of the given system into different quadrant cells. The algorithm then only calculates the forces between particles within a single cell, not taking into consideration any other single particles. For quadrant cells where the number of bodies occupying it is particularly small, the brute-force algorithm is used to solve the simulation instead, as it is inefficient to divide the space within the quadrant cell any more.
+			\begin{figure}[ht]
+				\centering
+				\includegraphics[width=0.5\textwidth]{barneshut.png}
+				\caption{\label{cells}An illustration of the Barnes-Hut quadrant division}
+				\cite{barnespic}
+			\end{figure}
 	
-	\begin{figure}[ht]
-		\centering
-		\includegraphics[width=0.5\textwidth]{barneshut.png}
-		\caption{\label{cells}An illustration of the Barnes-Hut quadrant division}
-		\cite{barnespic}
-	\end{figure}
-	
-		All other cells are then each treated as one massive body, which has the mass of all particles contained within a given cell. The position of this dense uber-body is centered around the center of mass of all neighboring particles within that cell. Other than this important modification, the algorithm still works very similarly to the brute-force algorithm. 
-		
-		The fact that only a single massive body is sometimes used instead of many other smaller bodies in the computation drastically reduces the number of pairs whose influences have to be calculated. The time complexity of the Barnes-Hut algorithm is thus bounded by $O(k \cdot n \cdot log n)$, where $k$ is the number of time steps we simulate for, and $n$ is the number of bodies there are in the given system.
-		
-		It is important to also mention the drawbacks of this algorithm. Because of the approximated mass of a majority of the particles during a single iteration, the Barnes-Hut algorithm is not very accurate in the scientific sense. 
-		
-		Apparently, the recursive nature of the algorithm also makes it somewhat unsuitable for parallel implementations, meaning that the brute-force algorithm might actually perform better on a massively multi-threaded machine for systems with reasonably low numbers of space bodies.
-		
+			All other cells are then each treated as one massive body, which has the mass of all particles contained within a given cell. The position of this dense uber-body is centered around the center of mass of all neighboring particles within that cell. Other than this important modification, the algorithm still works very similarly to the brute-force algorithm. 
+			
+			The fact that only a single massive body is sometimes used instead of many other smaller bodies in the computation drastically reduces the number of pairs whose influences have to be calculated. The time complexity of the Barnes-Hut algorithm is thus bounded by $O(k \cdot n \cdot log n)$, where $k$ is the number of time steps we simulate for, and $n$ is the number of bodies there are in the given system.
+			
+			It is important to also mention the drawbacks of this algorithm. Because of the approximated mass of a majority of the particles during a single iteration, the Barnes-Hut algorithm is not very accurate in the scientific sense. 
+			
+			Apparently, the recursive nature of the algorithm also makes it somewhat unsuitable for parallel implementations, meaning that the brute-force algorithm might actually perform better on a massively multi-threaded machine for systems with reasonably low numbers of space bodies.
+			
 		These reasons are why I chose to pursue the implementation, optimization and parallelization of the brute-force algorithm over the Barnes-Hut algorithm.
 	
 	\section{Related work in literature}
@@ -157,6 +155,7 @@
 		Then I wanted to transform the code using the OpenMP parallel programming interface, and finally, if time permitted, create an implementation that would use NVIDIA's CUDA technology.
 		
 		I planned on testing and benchmarking the computing performance of all of these proposed versions on the following hardware:
+		
 		\begin{itemize}  
 			\item[-]{a typical personal computer CPU architecture, i.e. Intel’s x86-64. I planned to use Kansas State University’s Beocat supercomputer to run the tests on this architecture.}
 			
@@ -189,7 +188,6 @@
 			\caption{\label{gantt}Gantt chart of the proposed estimated project work schedule}
 		\end{figure} 
 		
-	\newpage
 	\section{Project progress: Naive implementation}
 	
 		The first task on my plan was the implementation of a naive version of the brute-force N-Body simulation algorithm. 
@@ -351,7 +349,7 @@
 	
 	\bibliographystyle{ieeetr}
 	\bibliography{mybibliographyfile}
-	%=====================================================	
+	
 \end{document}
 
 
