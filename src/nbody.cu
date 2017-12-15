@@ -183,6 +183,12 @@ void simulate(int bodies, int iters)
 	uint64_t appxFlops = (19 * getCount() - 5)*getCount()*iters;
 	timeInSeconds = finish;
 	gflops = 1e-9 * appxFlops / finish;
+
+	cudaFree(xPos);
+	cudaFree(yPos);
+	cudaFree(xVel);
+	cudaFree(yVel);
+	cudaFree(mass);
 }
 
 int main(int argc, char **argv)

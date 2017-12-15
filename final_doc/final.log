@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.11.29)  14 DEC 2017 21:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.11.29)  15 DEC 2017 14:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -801,65 +801,73 @@ LaTeX Info: Redefining \nameref on input line 29.
 <sandbox2.jpg, id=61, 489.32813pt x 274.77657pt>
 File: sandbox2.jpg Graphic file (type jpg)
 <use sandbox2.jpg>
-Package pdftex.def Info: sandbox2.jpg  used on input line 74. on input line 74.
+Package pdftex.def Info: sandbox2.jpg  used on input line 76. on input line 76.
 
-Package pdftex.def Info: Requested size: 232.19843pt x 130.39024pt on input lin
-e 74.
- [1{c:/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+Package pdftex.def Info: Requested size: 258.0pt x 144.88037pt on input line 76
+.
+
+Overfull \hbox (6.0pt too wide) in paragraph at lines 76--77
+ [][] 
+ []
+
+[1{c:/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
  <./sandbox2.jpg>]
 <barneshut.png, id=81, 453.94594pt x 302.63063pt>
 File: barneshut.png Graphic file (type png)
 <use barneshut.png>
-Package pdftex.def Info: barneshut.png  used on input line 112. on input line 1
-12.
-Package pdftex.def Info: Requested size: 232.19843pt x 154.80135pt on input lin
-e 112.
- [2 <./barneshut.png>]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 151.
+Package pdftex.def Info: barneshut.png  used on input line 116. on input line 1
+16.
+Package pdftex.def Info: Requested size: 258.0pt x 172.00252pt on input line 11
+6.
 
+Overfull \hbox (6.0pt too wide) in paragraph at lines 116--117
+ [][] 
+ []
 
-(c:/texlive/2017/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+[2 <./barneshut.png>]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 155.
+
+ (c:/texlive/2017/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-<ganttchart.png, id=108, 654.19406pt x 331.99031pt>
-File: ganttchart.png Graphic file (type png)
-<use ganttchart.png>
-Package pdftex.def Info: ganttchart.png  used on input line 184. on input line 
-184.
-Package pdftex.def Info: Requested size: 232.19843pt x 117.83458pt on input lin
-e 184.
- [3]
+<gantt.png, id=110, 529.22719pt x 286.06876pt>
+File: gantt.png Graphic file (type png)
+<use gantt.png>
+Package pdftex.def Info: gantt.png  used on input line 188. on input line 188.
+Package pdftex.def Info: Requested size: 258.0pt x 139.45905pt on input line 18
+8.
+
+Overfull \hbox (6.0pt too wide) in paragraph at lines 188--189
+ [][] 
+ []
+
+[3]
 Package epstopdf Info: Source file: <gnuplot/oop_vs_arr.eps>
 (epstopdf)                    date: 2017-12-14 21:35:46
 (epstopdf)                    size: 26487 bytes
 (epstopdf)             Output file: <gnuplot/oop_vs_arr-eps-converted-to.pdf>
-(epstopdf)                    date: 2017-12-14 21:04:27
-(epstopdf)                    size: 11172 bytes
+(epstopdf)                    date: 2017-12-14 21:35:50
+(epstopdf)                    size: 11177 bytes
 (epstopdf)             Command: <repstopdf --outfile=gnuplot/oop_vs_arr-eps-con
 verted-to.pdf gnuplot/oop_vs_arr.eps>
-(epstopdf)             \includegraphics on input line 214.
-runsystem(repstopdf --outfile=gnuplot/oop_vs_arr-eps-converted-to.pdf gnuplot/o
-op_vs_arr.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <gnuplot/oop_vs_arr-eps-converted-to.pdf>
-(epstopdf)                    date: 2017-12-14 21:35:50
-(epstopdf)                    size: 11177 bytes.
-<gnuplot/oop_vs_arr-eps-converted-to.pdf, id=119, pagebox=cropbox, 361.35pt x 2
+(epstopdf)             \includegraphics on input line 220.
+Package epstopdf Info: Output file is already uptodate.
+<gnuplot/oop_vs_arr-eps-converted-to.pdf, id=121, pagebox=cropbox, 361.35pt x 2
 16.81pt>
 File: gnuplot/oop_vs_arr-eps-converted-to.pdf Graphic file (type pdf)
 <use gnuplot/oop_vs_arr-eps-converted-to.pdf>
 Package pdftex.def Info: gnuplot/oop_vs_arr-eps-converted-to.pdf  used on input
- line 214. on input line 214.
-Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 21
-4.
+ line 220. on input line 220.
+Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 22
+0.
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 214--215
+Overfull \hbox (6.0pt too wide) in paragraph at lines 220--221
  [][] 
  []
 
-[4 <./ganttchart.png> <./gnuplot/oop_vs_arr-eps-converted-to.pdf>]
+[4 <./gantt.png> <./gnuplot/oop_vs_arr-eps-converted-to.pdf>]
 Package epstopdf Info: Source file: <gnuplot/speedup.eps>
 (epstopdf)                    date: 2017-12-14 21:35:17
 (epstopdf)                    size: 36466 bytes
@@ -868,28 +876,25 @@ Package epstopdf Info: Source file: <gnuplot/speedup.eps>
 (epstopdf)                    size: 12368 bytes
 (epstopdf)             Command: <repstopdf --outfile=gnuplot/speedup-eps-conver
 ted-to.pdf gnuplot/speedup.eps>
-(epstopdf)             \includegraphics on input line 233.
+(epstopdf)             \includegraphics on input line 239.
 Package epstopdf Info: Output file is already uptodate.
-<gnuplot/speedup-eps-converted-to.pdf, id=135, pagebox=cropbox, 361.35pt x 216.
+<gnuplot/speedup-eps-converted-to.pdf, id=137, pagebox=cropbox, 361.35pt x 216.
 81pt>
 File: gnuplot/speedup-eps-converted-to.pdf Graphic file (type pdf)
 <use gnuplot/speedup-eps-converted-to.pdf>
 Package pdftex.def Info: gnuplot/speedup-eps-converted-to.pdf  used on input li
-ne 233. on input line 233.
+ne 239. on input line 239.
 Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 23
-3.
+9.
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 233--234
+Overfull \hbox (6.0pt too wide) in paragraph at lines 239--240
  [][] 
  []
 
 
-Underfull \hbox (badness 1509) in paragraph at lines 257--258
+Underfull \hbox (badness 1509) in paragraph at lines 263--264
 []\OT1/ptm/m/n/10 Benchmarking the Xeon Phi-friendly code was pretty
  []
-
-
-LaTeX Warning: Reference `phi32' on page 5 undefined on input line 259.
 
 Package epstopdf Info: Source file: <gnuplot/phi_vs_32.eps>
 (epstopdf)                    date: 2017-12-14 21:34:46
@@ -899,18 +904,18 @@ Package epstopdf Info: Source file: <gnuplot/phi_vs_32.eps>
 (epstopdf)                    size: 12127 bytes
 (epstopdf)             Command: <repstopdf --outfile=gnuplot/phi_vs_32-eps-conv
 erted-to.pdf gnuplot/phi_vs_32.eps>
-(epstopdf)             \includegraphics on input line 263.
+(epstopdf)             \includegraphics on input line 269.
 Package epstopdf Info: Output file is already uptodate.
-<gnuplot/phi_vs_32-eps-converted-to.pdf, id=138, pagebox=cropbox, 361.35pt x 21
+<gnuplot/phi_vs_32-eps-converted-to.pdf, id=141, pagebox=cropbox, 361.35pt x 21
 6.81pt>
 File: gnuplot/phi_vs_32-eps-converted-to.pdf Graphic file (type pdf)
 <use gnuplot/phi_vs_32-eps-converted-to.pdf>
 Package pdftex.def Info: gnuplot/phi_vs_32-eps-converted-to.pdf  used on input 
-line 263. on input line 263.
+line 269. on input line 269.
 Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 26
-3.
+9.
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 263--264
+Overfull \hbox (6.0pt too wide) in paragraph at lines 269--270
  [][] 
  []
 
@@ -924,22 +929,47 @@ Package epstopdf Info: Source file: <gnuplot/cuda.eps>
 (epstopdf)                    size: 13898 bytes
 (epstopdf)             Command: <repstopdf --outfile=gnuplot/cuda-eps-converted
 -to.pdf gnuplot/cuda.eps>
-(epstopdf)             \includegraphics on input line 307.
+(epstopdf)             \includegraphics on input line 311.
 Package epstopdf Info: Output file is already uptodate.
-<gnuplot/cuda-eps-converted-to.pdf, id=166, pagebox=cropbox, 361.35pt x 216.81p
+<gnuplot/cuda-eps-converted-to.pdf, id=169, pagebox=cropbox, 361.35pt x 216.81p
 t>
 File: gnuplot/cuda-eps-converted-to.pdf Graphic file (type pdf)
 <use gnuplot/cuda-eps-converted-to.pdf>
 Package pdftex.def Info: gnuplot/cuda-eps-converted-to.pdf  used on input line 
-307. on input line 307.
-Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 30
-7.
+311. on input line 311.
+Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 31
+1.
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 307--308
+Overfull \hbox (6.0pt too wide) in paragraph at lines 311--312
  [][] 
  []
 
-[6 <./gnuplot/cuda-eps-converted-to.pdf>] (./final.bbl
+[6 <./gnuplot/cuda-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <gnuplot/big_comparison.eps>
+(epstopdf)                    date: 2017-12-15 11:08:46
+(epstopdf)                    size: 48029 bytes
+(epstopdf)             Output file: <gnuplot/big_comparison-eps-converted-to.pd
+f>
+(epstopdf)                    date: 2017-12-15 11:08:50
+(epstopdf)                    size: 14721 bytes
+(epstopdf)             Command: <repstopdf --outfile=gnuplot/big_comparison-eps
+-converted-to.pdf gnuplot/big_comparison.eps>
+(epstopdf)             \includegraphics on input line 319.
+Package epstopdf Info: Output file is already uptodate.
+<gnuplot/big_comparison-eps-converted-to.pdf, id=184, pagebox=cropbox, 361.35pt
+ x 216.81pt>
+File: gnuplot/big_comparison-eps-converted-to.pdf Graphic file (type pdf)
+<use gnuplot/big_comparison-eps-converted-to.pdf>
+Package pdftex.def Info: gnuplot/big_comparison-eps-converted-to.pdf  used on i
+nput line 319. on input line 319.
+Package pdftex.def Info: Requested size: 258.0pt x 154.79962pt on input line 31
+9.
+
+Overfull \hbox (6.0pt too wide) in paragraph at lines 319--320
+ [][] 
+ []
+
+(./final.bbl
 Underfull \hbox (badness 10000) in paragraph at lines 26--29
 []\OT1/ptm/m/n/8 Elucidation, ``Barnes-Hut N-body Sim-u-la-tion in
  []
@@ -983,28 +1013,24 @@ Underfull \hbox (badness 4193) in paragraph at lines 60--64
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 332.
- [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 332.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 355.
+ [7 <./gnuplot/big_comparison-eps-converted-to.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 355.
  (./final.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 332.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 332.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 355.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 355.
 Package rerunfilecheck Info: File `final.out' has not changed.
-(rerunfilecheck)             Checksum: 6A6246F339AB4A49EAF383572BB29EF9;890.
-
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 332.
+(rerunfilecheck)             Checksum: 15C29FA86384DF518D1957F84FAEAFE1;890.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 355.
  ) 
 Here is how much of TeX's memory you used:
- 8638 strings out of 492985
- 131995 string characters out of 6136283
- 238262 words of memory out of 5000000
- 12014 multiletter control sequences out of 15000+600000
+ 8648 strings out of 492985
+ 132261 string characters out of 6136283
+ 236469 words of memory out of 5000000
+ 12019 multiletter control sequences out of 15000+600000
  42879 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,6n,40p,875b,369s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,6n,40p,884b,369s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc}<c:/texlive/2017/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2017/texmf-dist/fo
 nts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2017/texmf-dist/fonts/type1
@@ -1018,10 +1044,10 @@ ts/type1/urw/courier/ucrr8a.pfb><c:/texlive/2017/texmf-dist/fonts/type1/urw/tim
 es/utmb8a.pfb><c:/texlive/2017/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><c:
 /texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2017/texm
 f-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on final.pdf (7 pages, 383555 bytes).
+Output written on final.pdf (7 pages, 390482 bytes).
 PDF statistics:
- 266 PDF objects out of 1000 (max. 8388607)
- 224 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 148 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 283 PDF objects out of 1000 (max. 8388607)
+ 238 compressed objects within 3 object streams
+ 57 named destinations out of 1000 (max. 500000)
+ 153 words of extra memory for PDF output out of 10000 (max. 10000000)
 
